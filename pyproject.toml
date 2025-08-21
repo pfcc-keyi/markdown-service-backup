@@ -1,0 +1,59 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "markdown-service"
+version = "1.0.0"
+description = "Document to Markdown conversion microservice"
+authors = ["Markdown Service Team"]
+readme = "README.md"
+packages = [{include = "markdown_service", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+fastapi = "^0.104.0"
+uvicorn = {extras = ["standard"], version = "^0.24.0"}
+pydantic = "^1.10.0,<2.0.0"
+httpx = "^0.25.0"
+structlog = "^23.1.0"
+prometheus-client = "^0.17.0"
+python-multipart = "^0.0.6"
+aiofiles = "^23.1.0"
+python-magic = "^0.4.27"
+tenacity = "^8.2.0"
+filetype = "^1.2.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.4.0"
+pytest-asyncio = "^0.21.0"
+pytest-cov = "^4.1.0"
+black = "^23.7.0"
+isort = "^5.12.0"
+flake8 = "^6.0.0"
+mypy = "^1.5.0"
+
+[tool.poetry.group.test.dependencies]
+httpx = "^0.25.0"
+pytest-mock = "^3.11.0"
+
+[tool.black]
+line-length = 88
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"] 
