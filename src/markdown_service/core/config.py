@@ -39,6 +39,9 @@ class Settings(BaseSettings):
     # Health check
     health_check_timeout: int = Field(default=10, env="HEALTH_CHECK_TIMEOUT")
     
+    # Security and authentication
+    service_token: str = Field(..., env="SERVICE_TOKEN")
+    
     # Development mode settings
     dev_mode: bool = Field(default=False, env="DEV_MODE")
     
