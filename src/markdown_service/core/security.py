@@ -74,7 +74,9 @@ class SecurityManager:
         if settings.dev_mode:
             return "dev-token"
         
-        raise ValueError("Service token not found")
+        # Fallback: return empty string (will cause 401 on auth but won't crash startup)
+        logger.warning("Service token not found, using empty string")
+        return ""
     
     def get_marker_headers(self) -> Dict[str, str]:
         """Get headers for Marker API requests."""
