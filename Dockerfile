@@ -19,6 +19,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 # 复制源代码
 COPY src/ ./src/
 
+# 复制启动脚本
+COPY start_production.py .
+
 # 创建非root用户
 RUN useradd --create-home --shell /bin/bash app && \
     chown -R app:app /app
@@ -33,5 +36,5 @@ EXPOSE 8001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
     CMD curl -f http://localhost:8001/health || exit 1
 
-# 启动命令
-CMD ["python", "-m", "uvicorn", "src.markdown_service.main:app", "--host", "0.0.0.0", "--port", "8001"] 
+# 启动命令 - 使用启动脚本
+CMD ["python", "start_production.py"] 

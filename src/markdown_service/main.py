@@ -304,6 +304,16 @@ async def get_output_file(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/debug")
+async def debug_info():
+    """Debug endpoint without authentication."""
+    return {
+        "message": "Debug endpoint working",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "settings_loaded": bool(settings),
+        "security_manager_loaded": bool(security_manager)
+    }
+
 @app.get("/system/info")
 async def get_system_info(
     authenticated: bool = Depends(security_manager.validate_service_token)
