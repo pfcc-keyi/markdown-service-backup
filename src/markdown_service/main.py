@@ -323,17 +323,21 @@ async def get_output_file(
 @app.get("/debug")
 async def debug_info():
     """Debug endpoint without authentication."""
+    logger.info("Debug endpoint called successfully")
     return {
         "message": "Debug endpoint working",
         "timestamp": datetime.utcnow().isoformat() + "Z",
         "settings_loaded": bool(settings),
-        "security_manager_loaded": bool(security_manager)
+        "security_manager_loaded": bool(security_manager),
+        "routes_count": len(app.routes),
+        "routes": [{"path": route.path, "methods": list(route.methods)} for route in app.routes if hasattr(route, 'path')]
     }
 
 @app.get("/system/info")
 async def get_system_info():
     """Get system information for monitoring."""
     # Skip authentication for now to debug
+    logger.info("System info endpoint called")
     return {
         "service": settings.service_name,
         "version": settings.service_version,
@@ -343,3 +347,15 @@ async def get_system_info():
         "marker_client": "loaded" if marker_client else "failed",
         "timestamp": datetime.utcnow().isoformat() + "Z"
     }
+
+# Log route registration  
+logger.info("All routes registered successfully")
+
+# Print all registered routes for debugging
+@app.on_event("startup")
+async def startup_event():
+    logger.info("=== STARTUP: Listing all registered routes ===")
+    for route in app.routes:
+        if hasattr(route, 'path'):
+            logger.info(f"Route: {route.path} {getattr(route, 'methods', [])}")
+    logger.info("=== End of route list ===")
