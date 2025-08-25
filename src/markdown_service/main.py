@@ -333,6 +333,18 @@ async def debug_info():
         "routes": [{"path": route.path, "methods": list(route.methods)} for route in app.routes if hasattr(route, 'path')]
     }
 
+# Catch-all route for debugging
+@app.get("/{full_path:path}")
+async def catch_all(full_path: str):
+    """Catch all unmatched routes for debugging."""
+    logger.info(f"Catch-all route called with path: {full_path}")
+    return {
+        "message": "Catch-all route working",
+        "requested_path": f"/{full_path}",
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "available_routes": [route.path for route in app.routes if hasattr(route, 'path')]
+    }
+
 @app.get("/system/info")
 async def get_system_info():
     """Get system information for monitoring."""
