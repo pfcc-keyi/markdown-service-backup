@@ -4,7 +4,8 @@ Configuration management for the markdown service.
 import os
 from typing import Optional
 
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings
+from pydantic import Field
 
 
 class Settings(BaseSettings):
@@ -49,9 +50,10 @@ class Settings(BaseSettings):
     retry_attempts: int = Field(default=3, env="RETRY_ATTEMPTS")
     retry_delay: float = Field(default=1.0, env="RETRY_DELAY")
     
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = {
+        "env_file": ".env",
+        "case_sensitive": False
+    }
 
 
 # Global settings instance
