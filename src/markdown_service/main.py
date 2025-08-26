@@ -321,17 +321,23 @@ async def get_output_file(
 
 
 @app.get("/debug")
-async def debug_info():
-    """Debug endpoint without authentication."""
-    logger.info("Debug endpoint called successfully")
-    return {
-        "message": "Debug endpoint working",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
-        "settings_loaded": bool(settings),
-        "security_manager_loaded": bool(security_manager),
-        "routes_count": len(app.routes),
-        "routes": [{"path": route.path, "methods": list(route.methods)} for route in app.routes if hasattr(route, 'path')]
-    }
+async def debug_info(
+    authenticated: bool = Depends(security_manager.validate_service_token)
+):
+    """Debug endpoint with authentication."""
+    try:
+        logger.info("Debug endpoint called successfully")
+        return {
+            "message": "Debug endpoint working",
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "settings_loaded": bool(settings),
+            "security_manager_loaded": bool(security_manager),
+            "routes_count": len(app.routes),
+            "routes": [{"path": route.path, "methods": list(route.methods)} for route in app.routes if hasattr(route, 'path')]
+        }
+    except Exception as e:
+        logger.error(f"Debug endpoint error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Catch-all route for debugging
 @app.get("/{full_path:path}")
@@ -346,19 +352,24 @@ async def catch_all(full_path: str):
     }
 
 @app.get("/system/info")
-async def get_system_info():
+async def get_system_info(
+    authenticated: bool = Depends(security_manager.validate_service_token)
+):
     """Get system information for monitoring."""
-    # Skip authentication for now to debug
-    logger.info("System info endpoint called")
-    return {
-        "service": settings.service_name,
-        "version": settings.service_version,
-        "uptime": "system_uptime",
-        "file_system": file_manager.get_temp_dir_info() if file_manager else "not_available",
-        "security_manager": "loaded" if security_manager else "failed",
-        "marker_client": "loaded" if marker_client else "failed",
-        "timestamp": datetime.utcnow().isoformat() + "Z"
-    }
+    try:
+        logger.info("System info endpoint called")
+        return {
+            "service": settings.service_name,
+            "version": settings.service_version,
+            "uptime": "system_uptime",
+            "file_system": file_manager.get_temp_dir_info() if file_manager else "not_available",
+            "security_manager": "loaded" if security_manager else "failed",
+            "marker_client": "loaded" if marker_client else "failed",
+            "timestamp": datetime.utcnow().isoformat() + "Z"
+        }
+    except Exception as e:
+        logger.error(f"System info endpoint error: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Log route registration  
 logger.info("All routes registered successfully")
