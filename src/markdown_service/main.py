@@ -8,7 +8,8 @@ from datetime import datetime
 import time
 
 import structlog
-from fastapi import FastAPI, File, UploadFile, HTTPException, Depends
+from fastapi import FastAPI, File, UploadFile, HTTPException, Depends, routing
+from fastapi.routing import Mount
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import make_asgi_app
 
@@ -333,7 +334,14 @@ async def debug_info(
             "settings_loaded": bool(settings),
             "security_manager_loaded": bool(security_manager),
             "routes_count": len(app.routes),
-            "routes": [{"path": route.path, "methods": list(route.methods)} for route in app.routes if hasattr(route, 'path')]
+            "routes": [
+                {
+                    "path": route.path,
+                    "methods": list(route.methods) if hasattr(route, 'methods') else ['MOUNT'] if isinstance(route, Mount) else ['UNKNOWN']
+                } 
+                for route in app.routes 
+                if hasattr(route, 'path')
+            ]
         }
     except Exception as e:
         logger.error(f"Debug endpoint error: {e}")
